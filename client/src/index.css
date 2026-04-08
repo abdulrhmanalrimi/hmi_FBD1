@@ -177,7 +177,7 @@
 
   /* FBD-120 HMI Custom Styles */
   .hmi-button {
-    @apply bg-gray-300 border-2 border-gray-500 px-3 py-1 text-gray-800 font-bold text-sm hover:bg-gray-250 active:bg-gray-200 cursor-pointer;
+    @apply bg-gray-300 border-2 border-gray-500 px-3 py-1 text-gray-800 font-bold text-sm hover:bg-gray-200 active:bg-gray-200 cursor-pointer;
   }
 
   .hmi-header {
