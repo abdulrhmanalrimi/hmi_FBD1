@@ -3,8 +3,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type ScreenType = 'main' | 'machine1' | 'machine2' | 'material' | 'interlock1' | 'interlock2' | 'alarm' | 'autoCycle' | 'recipeManagement';
 
+interface ButtonStates {
+  [key: string]: boolean;
+}
+
 export default function Home() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('main');
+  const [buttonStates, setButtonStates] = useState<ButtonStates>({});
 
   const handlePrevious = () => {
     const order: ScreenType[] = ['main', 'machine1', 'machine2', 'material', 'interlock1', 'interlock2', 'alarm', 'autoCycle', 'recipeManagement'];
@@ -59,7 +64,7 @@ export default function Home() {
         {/* Content Area */}
         <div className="bg-gray-100 p-6 min-h-96">
           {currentScreen === 'main' && <MainMenuScreen onNavigate={setCurrentScreen} />}
-          {currentScreen === 'machine1' && <MachineOperation1Screen />}
+          {currentScreen === 'machine1' && <MachineOperation1Screen buttonStates={buttonStates} setButtonStates={setButtonStates} />}
           {currentScreen === 'machine2' && <MachineOperation2Screen />}
           {currentScreen === 'material' && <MaterialChargingScreen />}
           {currentScreen === 'interlock1' && <InterlockScreen1 />}
@@ -142,25 +147,47 @@ function MainMenuScreen({ onNavigate }: MainMenuScreenProps) {
   );
 }
 
-function MachineOperation1Screen() {
+interface MachineOp1Props {
+  buttonStates: ButtonStates;
+  setButtonStates: (states: ButtonStates) => void;
+}
+
+function MachineOperation1Screen({ buttonStates, setButtonStates }: MachineOp1Props) {
   const operations = [
-    { label: 'Inlet Damper', action: 'Open', state: 'Close' },
-    { label: 'Shaking', action: 'On', state: 'Off' },
-    { label: 'Bag Lock', action: 'Lock', state: 'Unlock' },
-    { label: 'Filter Seal', action: 'Seal', state: 'Unseal' },
-    { label: 'Container Seal', action: 'Seal', state: 'Unseal' },
-    { label: 'Purging', action: 'Open', state: 'Close' },
+    { label: 'Inlet Damper', action: 'Open', state: 'Close', id: 'inlet' },
+    { label: 'Shaking', action: 'On', state: 'Off', id: 'shaking' },
+    { label: 'Bag Lock', action: 'Lock', state: 'Unlock', id: 'bag' },
+    { label: 'Filter Seal', action: 'Seal', state: 'Unseal', id: 'filter' },
+    { label: 'Container Seal', action: 'Seal', state: 'Unseal', id: 'container' },
+    { label: 'Purging', action: 'Open', state: 'Close', id: 'purging' },
   ];
+
+  const toggleButton = (id: string) => {
+    setButtonStates({
+      ...buttonStates,
+      [id]: !buttonStates[id],
+    });
+  };
 
   return (
     <div className="grid grid-cols-3 gap-2">
       {operations.map((op, idx) => (
         <div key={idx} className="border-2 border-gray-400 bg-gray-150 p-2">
           <div className="text-xs font-bold text-gray-800 text-center mb-1">{op.label}</div>
-          <button className="w-full bg-gray-300 border border-gray-500 px-2 py-1 text-xs font-bold text-gray-800 hover:bg-gray-200 mb-1">
+          <button 
+            onClick={() => toggleButton(`${op.id}_action`)}
+            className={`w-full border border-gray-500 px-2 py-1 text-xs font-bold mb-1 transition-colors ${
+              buttonStates[`${op.id}_action`] ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-800 hover:bg-gray-200'
+            }`}
+          >
             {op.action}
           </button>
-          <button className="w-full bg-gray-300 border border-gray-500 px-2 py-1 text-xs font-bold text-gray-800 hover:bg-gray-200 mb-1">
+          <button 
+            onClick={() => toggleButton(`${op.id}_state`)}
+            className={`w-full border border-gray-500 px-2 py-1 text-xs font-bold mb-1 transition-colors ${
+              buttonStates[`${op.id}_state`] ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-800 hover:bg-gray-200'
+            }`}
+          >
             {op.state}
           </button>
           <button className="w-full bg-gray-300 border border-gray-500 px-2 py-1 text-xs font-bold text-gray-800 hover:bg-gray-200">
